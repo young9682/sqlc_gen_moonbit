@@ -1,0 +1,34 @@
+{
+  "question": "Which accounts remain with a user ID of at least 1?",
+  "sql": "SELECT \"users\".\"id\", \"users\".\"name\", \"users\".\"email\" FROM \"users\" WHERE \"users\".\"id\" >= ? ORDER BY 1 ASC",
+  "params": [
+    [
+      "Integer",
+      "1"
+    ]
+  ],
+  "result": {
+    "columns": [
+      "id",
+      "name",
+      "email"
+    ],
+    "rows": [
+      [
+        [
+          "Integer",
+          "1"
+        ],
+        [
+          "Text",
+          "Alice Smith"
+        ],
+        [
+          "Text",
+          "alice.smith@example.com"
+        ]
+      ]
+    ],
+    "truncated": false
+  }
+}

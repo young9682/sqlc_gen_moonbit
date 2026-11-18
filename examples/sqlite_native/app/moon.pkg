@@ -1,16 +1,19 @@
 import {
   "mizchi/sqlite",
+  "moonbitlang/async",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
   "moonbitlang/x/encoding",
+  "moonbitlang/x/fs",
   "example_sqlite_native/db/gen",
+  "young9682/nl2sql/planner",
 }
 
 supported_targets = "native"
 
+pkgtype(kind: "executable")
+
 options(
-  "is-main": true,
-  link: {
-    "native": {
-      "cc-link-flags": "-lsqlite3",
-    },
-  },
+  link: { "native": { "cc-link-flags": "-lsqlite3" } },
 )

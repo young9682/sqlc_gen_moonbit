@@ -1,84 +1,82 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "backend_sqlite_native_example/db/gen"
+package "example_sqlite_native/db/gen"
 
-import(
-  "mizchi/sqlite"
-)
+import {
+  "mizchi/sqlite",
+  "moonbitlang/core/debug",
+}
 
 // Values
-pub fn create_user(@sqlite.Sqlite3, CreateUserParams) -> Int64
+pub fn create_user(@sqlite.Sqlite3, CreateUserParams) -> Int64 raise SqlError
 
 pub let create_user_sql : String
 
-pub fn delete_user(@sqlite.Sqlite3, DeleteUserParams) -> Int
+pub fn delete_user(@sqlite.Sqlite3, DeleteUserParams) -> Int32 raise SqlError
 
 pub let delete_user_sql : String
 
-pub fn get_user(@sqlite.Sqlite3, GetUserParams) -> GetUserRow?
+pub fn get_user(@sqlite.Sqlite3, GetUserParams) -> GetUserRow? raise SqlError
 
 pub let get_user_sql : String
 
-pub fn list_users(@sqlite.Sqlite3) -> Array[ListUsersRow]
+pub fn list_users(@sqlite.Sqlite3) -> Array[ListUsersRow] raise SqlError
 
 pub let list_users_sql : String
 
-pub fn update_user(@sqlite.Sqlite3, UpdateUserParams) -> Int
+pub fn update_user(@sqlite.Sqlite3, UpdateUserParams) -> Int32 raise SqlError
 
 pub let update_user_sql : String
 
 // Errors
+#derive(@debug.Debug)
+pub suberror SqlError {
+  SqlError(String)
+}
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub struct CreateUserParams {
   name : String
   email : String
 }
 pub fn CreateUserParams::new(String, String) -> Self
-pub impl Eq for CreateUserParams
-pub impl Show for CreateUserParams
 
+#derive(Eq, @debug.Debug)
 pub struct DeleteUserParams {
   id : Int64
 }
 pub fn DeleteUserParams::new(Int64) -> Self
-pub impl Eq for DeleteUserParams
-pub impl Show for DeleteUserParams
 
+#derive(Eq, @debug.Debug)
 pub struct GetUserParams {
   id : Int64
 }
 pub fn GetUserParams::new(Int64) -> Self
-pub impl Eq for GetUserParams
-pub impl Show for GetUserParams
 
+#derive(Eq, @debug.Debug)
 pub struct GetUserRow {
   id : Int64
   name : String
   email : String
   created_at : String
 }
-pub impl Eq for GetUserRow
-pub impl Show for GetUserRow
 
+#derive(Eq, @debug.Debug)
 pub struct ListUsersRow {
   id : Int64
   name : String
   email : String
   created_at : String
 }
-pub impl Eq for ListUsersRow
-pub impl Show for ListUsersRow
 
+#derive(Eq, @debug.Debug)
 pub struct UpdateUserParams {
   name : String
   email : String
   id : Int64
 }
 pub fn UpdateUserParams::new(String, String, Int64) -> Self
-pub impl Eq for UpdateUserParams
-pub impl Show for UpdateUserParams
 
 // Type aliases
 
 // Traits
-

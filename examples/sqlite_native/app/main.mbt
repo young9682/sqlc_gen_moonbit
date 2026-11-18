@@ -11,13 +11,10 @@ fn exec_sql(db : @sqlite.Sqlite3, sql : String) -> Unit {
 }
 
 ///|
-fn run() -> Unit raise @gen.SqlError {
-  // Open in-memory database
+fn run(path : String) -> Unit raise @gen.SqlError {
   let db = @sqlite.sqlite_open_v2(
-    cstring(":memory:"),
-    @sqlite.SQLITE_OPEN_READWRITE |
-    @sqlite.SQLITE_OPEN_CREATE |
-    @sqlite.SQLITE_OPEN_MEMORY,
+    cstring(path),
+    @sqlite.SQLITE_OPEN_READWRITE | @sqlite.SQLITE_OPEN_CREATE,
     Bytes::new(0),
   )
 
@@ -70,8 +67,24 @@ fn run() -> Unit raise @gen.SqlError {
 }
 
 ///|
-fn main {
-  run() catch {
-    _ => println("Error")
+async fn main {
+  let args = @env.args()
+  try {
+    match args {
+      [_] => run(":memory:")
+      [_, "--write-db"] => {
+        if @fs.path_exists("accounts.db") {
+          raise AuditError("accounts.db already exists. Use a fresh directory.")
+        }
+        run("accounts.db")
+      }
+      [_, "--audit-db", path] => audit(path)
+      _ => raise AuditError("Usage: app [--write-db | --audit-db PATH]")
+    }
+  } catch {
+    error => {
+      println(@debug.to_string(error))
+      @env.exit(1)
+    }
   }
 }

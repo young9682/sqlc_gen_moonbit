@@ -7,6 +7,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
+$nl2sqlRevision = 'af0c79c7f516dfb9da2e8c08d0a7cc67254c8b2d'
 
 $sdk = (Resolve-Path -LiteralPath $SqliteSdk).ProviderPath
 foreach ($file in @('include/sqlite3.h', 'lib/sqlite3.lib', 'bin/sqlite3.dll')) {
@@ -26,7 +27,8 @@ foreach ($part in @('app', 'db', 'moon.mod')) {
 }
 
 git clone --quiet https://github.com/young9682/nl2sql.mbt.git $nl2sql
-git -C $nl2sql checkout --quiet --detach ab67b851b5367bdc9bd312c207e7739f743b148d
+git -C $nl2sql checkout --quiet --detach $nl2sqlRevision
+$checkedOutRevision = git -C $nl2sql rev-parse HEAD
 
 $archive = Join-Path $localDependencies 'sqlite-0.2.1.zip'
 Invoke-WebRequest 'https://download.mooncakes.io/user/mizchi/sqlite/0.2.1.zip' -OutFile $archive
@@ -60,9 +62,9 @@ try {
   Push-Location $work
   try {
     & $app --write-db
-    $before = (Get-FileHash -LiteralPath 'accounts.db').Hash
+    $before = (Get-FileHash -LiteralPath 'accounts.db' -Algorithm SHA256).Hash.ToLowerInvariant()
     & $app --audit-db accounts.db > audit-result.json
-    $after = (Get-FileHash -LiteralPath 'accounts.db').Hash
+    $after = (Get-FileHash -LiteralPath 'accounts.db' -Algorithm SHA256).Hash.ToLowerInvariant()
     if ($before -ne $after) {
       throw 'The audit changed the database.'
     }
@@ -71,12 +73,21 @@ try {
     $rows = ConvertTo-Json -InputObject $result.result.rows -Depth 5 -Compress
     $params = ConvertTo-Json -InputObject $result.params -Depth 5 -Compress
     if ($rows -cne '[[["Integer","1"],["Text","Alice Smith"],["Text","alice.smith@example.com"]]]' -or
-        $params -cne '[["Integer","1"]]' -or $result.result.truncated) {
+        $params -cne '[["Integer","1"]]' -or $result.result.truncated -ne $false) {
       throw 'The audit output differs from the expected surviving account.'
     }
+
+    [ordered]@{
+      nl2sql_revision = $checkedOutRevision
+      moonbit_compiler = (moonc -v)
+      database_sha256_before_audit = $before
+      database_sha256_after_audit = $after
+    } | ConvertTo-Json | Set-Content -Encoding utf8NoBOM -LiteralPath 'audit-verification.json'
+
     Get-Content -LiteralPath 'audit-result.json'
     "PASS: audited the surviving account and verified an unchanged SQLite SHA-256."
     "Audit JSON: $(Join-Path $work 'audit-result.json')"
+    "Verification JSON: $(Join-Path $work 'audit-verification.json')"
   } finally {
     Pop-Location
   }

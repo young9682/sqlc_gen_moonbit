@@ -1,0 +1,6 @@
+{
+  "nl2sql_revision": "af0c79c7f516dfb9da2e8c08d0a7cc67254c8b2d",
+  "moonbit_compiler": "v0.10.20+65efd5b93 (2026-11-05)",
+  "database_sha256_before_audit": "db60e80de2529d10ecb7a95b4cb4d14d5f5c127cfa884fd163465f6ea9b5c41d",
+  "database_sha256_after_audit": "db60e80de2529d10ecb7a95b4cb4d14d5f5c127cfa884fd163465f6ea9b5c41d"
+}
